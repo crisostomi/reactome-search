@@ -10,9 +10,9 @@ import glob
 def load_model(folder_path, file_name, class_name):
     file_path = folder_path + "/" + file_name
     dependencies = ["Modelica"]
-    for file in os.listdir(folder_path):
-        if file.endswith(".mo") and not file == file_name:
-            dependencies.append(folder_path + "/" + file)
+    # for file in os.listdir(folder_path):
+    #     if file.endswith(".mo") and not file == file_name:
+    #         dependencies.append(folder_path + "/" + file)
     dependencies.append('/home/don/Dropbox/Tesisti/software/BioChem-1.0.1/BioChem/package.mo')
     dependencies.append('/home/don/Dropbox/Tesisti/software/BioChem-1.0.1/new-models/reactions.mo')
     return OMPython.ModelicaSystem(file_path, class_name, dependencies)
