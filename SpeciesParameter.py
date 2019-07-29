@@ -8,5 +8,6 @@ class SpeciesParameter:
         self.max_amount = None
         self.amount = None
         self.fixed = None
+        self.name = None
 
 

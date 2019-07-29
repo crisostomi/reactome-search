@@ -70,18 +70,19 @@ def getUndefinedParameters(model):
 def getSpeciesParameters(params):
     species_params = set()
     for param in params:
-        m = re.match("c\_[0-9]+\.(\w+)\.n", param)
+        m = re.match(".+species\_([0-9]+)", param)
         if m is not None:
-            species_params.add(m.group(1))
-
+            speciesName = "species_"+m.group(1)
+            species_params.add(speciesName)
     return species_params
 
-def getReactionsParameters(params):
+def getReactionParameters(params):
     reaction_params = set()
     for param in params:
-        m = re.match("c\_[0-9]+\.(\w+)\.s1", param)
+        m = re.match(".+reaction\_([0-9]+)", param)
         if m is not None:
-            reaction_params.add(m.group(1))
+            reactionName = "reaction_"+m.group(1)
+            reaction_params.add(reactionName)
 
     return reaction_params
 
