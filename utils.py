@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt    # plottare grafici
 import seaborn as sns              # si basa su plt, ha funzioni piu sofisticate
 import shutil
 import glob
+import re
 
 
 def load_model(folder_path, file_name, class_name):
@@ -13,8 +14,10 @@ def load_model(folder_path, file_name, class_name):
     for file in os.listdir(folder_path):
         if file.endswith(".mo") and not file == file_name:
             dependencies.append(folder_path + file)
-    dependencies.append('/home/don/Dropbox/Tesisti/software/BioChem-1.0.1/BioChem/package.mo')
-    dependencies.append('/home/don/Dropbox/Tesisti/software/BioChem-1.0.1/new-models/reactions.mo')
+
+    user_home = os.environ['HOME']
+    dependencies.append(user_home + '/Dropbox/Tesisti/software/BioChem-1.0.1/BioChem/package.mo')
+    dependencies.append(user_home + '/Dropbox/Tesisti/software/BioChem-1.0.1/new-models/reactions.mo')
     return OMPython.ModelicaSystem(file_path, class_name, dependencies)
 
 def moveOutput():
@@ -63,3 +66,22 @@ def plot_solutions(solution_frame, variables=[]):
 
 def getUndefinedParameters(model):
     return [parameter for parameter,value in model.getParameters().items() if value is None]
+
+def getSpeciesParameters(params):
+    species_params = set()
+    for param in params:
+        m = re.match("c\_[0-9]+\.(\w+)\.n", param)
+        if m is not None:
+            species_params.add(m.group(1))
+
+    return species_params
+
+def getReactionsParameters(params):
+    reaction_params = set()
+    for param in params:
+        m = re.match("c\_[0-9]+\.(\w+)\.s1", param)
+        if m is not None:
+            reaction_params.add(m.group(1))
+
+    return reaction_params
+

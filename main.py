@@ -16,7 +16,12 @@ if __name__ == '__main__':
 
     # 0. Carico BioSystem.mo e per ogni specie creo un oggetto di tipo SpeciesParameter e per ogni rate..
     model = load_model(folder_path, file_name, class_name)
-    params = [x["Name"] for x in model.getQuantities()]
+    params = [param["Name"] for param in model.getQuantities()]
+    print(params)
+    print(getSpeciesParameters(params))
+    print(getReactionsParameters(params))
+
+
     # undef = getUndefinedParameters(model)
     # rateParams = find_rate_params(undef)
     # speciesParams = find_species_params(undef)
