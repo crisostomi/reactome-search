@@ -1,5 +1,5 @@
 import math, random
-from node import Node
+from algorithm.node import Node
 
 
 def cooling_rate(time):

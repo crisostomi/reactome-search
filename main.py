@@ -1,5 +1,5 @@
 from utils import *
-from state import *
+from algorithm.state import *
 import sys
 import warnings
 
@@ -17,34 +17,26 @@ if __name__ == '__main__':
     kb_file = sys.argv[3]
     model = load_model(folder_path, file_name, class_name)
 
-    parsedConfigFile = parseFile(config_file)
+    # parsedConfigFile = parseFile(config_file)
 
-    speciesParams = getSpeciesParameters(parsedConfigFile)
-    irrevReactionParams = getIrrevReactionParameters(parsedConfigFile)
-    revReactionParams = getRevReactionParameters(parsedConfigFile)
-
-    parsedKbFile = parseFile(kb_file)
-
-    initializeSpeciesParams(speciesParams, parsedKbFile)
-    initializeIrrevReactionParams(irrevReactionParams, parsedKbFile)
-    initializeRevReactionParams(revReactionParams, parsedKbFile)
-
-    undefSpeciesParams = getUndefinedSpeciesParams(speciesParams)
-    undefIrrevReactionParams = getUndefinedIrrevReactionParams(irrevReactionParams)
-    undefRevReactionParams = getUndefinedRevReactionParams(revReactionParams)
-
-    initial_state = State(model)
-
-    print(model.getParameters())
-
-    # for speciesParam in undefSpeciesParams:
-    #     param_name = "init[" + speciesParam.initIndex + "]"
-    #     param_value = speciesParam.get_random_value()
-    #     initial_state.model.setParameters(**{param_name: param_value})
+    # speciesParams = getSpeciesParameters(parsedConfigFile)
+    # irrevReactionParams = getIrrevReactionParameters(parsedConfigFile)
+    # revReactionParams = getRevReactionParameters(parsedConfigFile)
     #
+    # parsedKbFile = parseFile(kb_file)
     #
-    # initial_state.model.setSimulationOptions(stopTime=20)
-    # initial_state.model.simulate()
-    # df = get_solutions(initial_state.model, ["c_1.reaction_1247665.k1"])
-    # plot_solutions(df, ["c_1.reaction_1247665.k1"])
+    # initializeSpeciesParams(speciesParams, parsedKbFile)
+    # initializeIrrevReactionParams(irrevReactionParams, parsedKbFile)
+    # initializeRevReactionParams(revReactionParams, parsedKbFile)
+    #
+    # undefSpeciesParams = getUndefinedSpeciesParams(speciesParams)
+    # undefIrrevReactionParams = getUndefinedIrrevReactionParams(irrevReactionParams)
+    # undefRevReactionParams = getUndefinedRevReactionParams(revReactionParams)
+    #
+    # initial_state = State(model)
+    #
+    # setFixedSpeciesParameters(model, speciesParams)
+    # setFixedIrrevReactionParameters(model, revReactionParams)
+    # setFixedRevReactionParameters(model, irrevReactionParams)
+
     moveOutput()

@@ -1,18 +1,17 @@
 import numpy as np
+from Parameter import Parameter
 
+class SpeciesParameter(Parameter):
 
-class SpeciesParameter:
-
-    def __init__(self, species_id, monitorIndex, initIndex):
-        self.species_id = species_id
+    def __init__(self, id, monitorIndex, initIndex, compartment):
+        super().__init__(id, compartment)
         self.initial_amount = None
         self.min_amount = None
         self.max_amount = None
         self.amount = None
-        self.fixed = None
         self.name = None
         self.monitorIndex = monitorIndex
         self.initIndex = initIndex
 
-    def get_random_value(self):
+    def get_random_value_in_bounds(self):
         return np.random.uniform(self.min_amount, self.max_amount)

@@ -68,13 +68,13 @@ def getUndefinedParameters(model):
     return [parameter for parameter,value in model.getParameters().items() if value is None]
 
 def getSpeciesParameters(parsedConfigFile):
-    return [ SpeciesParameter(species.get('id'), species.get('bounds_index'), species.get('init_index')) for species in parsedConfigFile.iter('species')]
+    return [ SpeciesParameter(species.get('id'), species.get('bounds_index'), species.get('init_index'), species.get('compartment')) for species in parsedConfigFile.iter('species')]
 
 def getRevReactionParameters(parsedConfigFile):
-    return [ ReactionParameter(reaction.get('id'), True, reaction.get('k1_index'), reaction.get('k2_index')) for reaction in parsedConfigFile.iter('reversible')]
+    return [ ReactionParameter(reaction.get('id'), True, reaction.get('k1_index'), reaction.get('k2_index'), reaction.get('compartment')) for reaction in parsedConfigFile.iter('reversible')]
 
 def getIrrevReactionParameters(parsedConfigFile):
-    return [ ReactionParameter(reaction.get('id'), False, reaction.get('k1_index'), reaction.get('k2_index')) for reaction in parsedConfigFile.iter('irreversible')]
+    return [ ReactionParameter(reaction.get('id'), False, reaction.get('k1_index'), reaction.get('compartment')) for reaction in parsedConfigFile.iter('irreversible')]
 
 def getUndefinedSpeciesParams(speciesParams):
     return [ speciesParam for speciesParam in speciesParams if not speciesParam.fixed ]
@@ -122,3 +122,30 @@ def initializeSpeciesParams(speciesParams, parsedConfigFile):
 def parseFile(file):
     tree = ET.parse(file)
     return tree.getroot()
+
+def setSpeciesParameter(model, speciesParameter, value):
+    param_name = speciesParameter.compartment+".init[" + speciesParameter.initIndex + "]"
+    model.setParameters(**{param_name: value})
+
+def setRevReactionParameter(model, reactionParameter, value):
+    param_name = reactionParameter.compartment+".init[" + reactionParameter.initIndex + "]"
+    model.setParameters(**{param_name: value})
+
+def setIrrevReactionParameter(model, reactionParameter, value):
+    param_name = reactionParameter.compartment+".init[" + reactionParameter.initIndex + "]"
+    model.setParameters(**{param_name: value})
+
+def setFixedSpeciesParameters(model, speciesParams):
+    for speciesParam in speciesParams:
+        if speciesParam.fixed:
+            setSpeciesParameter(model, speciesParam, speciesParam.initial_amount)
+
+def setFixedIrrevReactionParameters(model, reactionParams):
+    for reactionParam in reactionParams:
+        if reactionParam.fixed:
+            setRevReactionParameter(model, reactionParam, reactionParam.initial_amount)
+
+def setFixedRevReactionParameters(model, reactionParams):
+    for reactionParam in reactionParams:
+        if reactionParam.fixed:
+            setIrrevReactionParameter(model, reactionParam, reactionParam.initial_amount)
