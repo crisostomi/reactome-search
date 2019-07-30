@@ -5,8 +5,8 @@ class State:
     def __init__(self, model):
         self.model = model
 
-    def __init__(self, folder_path, file_name, class_name):
-        self.model = load_model(folder_path, file_name, class_name)
+    # def __init__(self, folder_path, file_name, class_name):
+    #     self.model = load_model(folder_path, file_name, class_name)
 
     def get_adjacents(self, step):
         adjs = []

@@ -17,7 +17,6 @@ if __name__ == '__main__':
     kb_file = sys.argv[3]
     model = load_model(folder_path, file_name, class_name)
 
-
     parsedConfigFile = parseFile(config_file)
 
     speciesParams = getSpeciesParameters(parsedConfigFile)
@@ -34,13 +33,16 @@ if __name__ == '__main__':
     undefIrrevReactionParams = getUndefinedIrrevReactionParams(irrevReactionParams)
     undefRevReactionParams = getUndefinedRevReactionParams(revReactionParams)
 
-    # initial_state = State(folder_path, file_name, class_name)
-    # undef = getUndefinedParameters(initial_state.model)
-    # print(undef)
-    # for param in undef:
-    #     param_value = np.random.uniform(0, 1)
-    #     initial_state.model.setParameters(**{param: param_value})
-    #     print(param,param_value)
+    initial_state = State(model)
+
+    print(model.getParameters())
+
+    # for speciesParam in undefSpeciesParams:
+    #     param_name = "init[" + speciesParam.initIndex + "]"
+    #     param_value = speciesParam.get_random_value()
+    #     initial_state.model.setParameters(**{param_name: param_value})
+    #
+    #
     # initial_state.model.setSimulationOptions(stopTime=20)
     # initial_state.model.simulate()
     # df = get_solutions(initial_state.model, ["c_1.reaction_1247665.k1"])

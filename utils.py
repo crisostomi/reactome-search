@@ -10,7 +10,6 @@ import xml.etree.ElementTree as ET
 from SpeciesParameter import SpeciesParameter
 from ReactionParameter import ReactionParameter
 
-
 def load_model(folder_path, file_name, class_name):
     file_path = folder_path + file_name
     dependencies = ["Modelica"]
@@ -30,7 +29,6 @@ def moveOutput():
 
 def flushOutput():
     shutil.rmtree('./output/', ignore_errors=True)
-
 
 # Ritorna un oggetto Pandas DataFrame con all'interno i datapoints ({istante, valore}) delle variabili simulate del modello
 
@@ -52,7 +50,6 @@ def get_solutions(model, variables=[]):
             ignore_index=True
         )
     return df
-
 
 # Prende in input un DataFrame pandas in cui vi sia la colonna "time", e una lista di variabili
 # Plotta il moto delle variabili su un grafico in cui le ascisse sono l'asse del tempo e le ordinate l'asse dei valori
@@ -93,10 +90,10 @@ def initializeIrrevReactionParams(reactionParams, configFileRoot):
         for reaction in configFileRoot.iter('irreversible'):
             if reactionParam.reaction_id == reaction.get('id'):
                 if reaction.get('k1') != '':
-                    reactionParam.rate = reaction.get('k1')
+                    reactionParam.rate = float(reaction.get('k1'))
                     reactionParam.fixed = True
-                reactionParam.min_rate = reaction.get('min_k1')
-                reactionParam.max_rate = reaction.get('max_k1')
+                reactionParam.min_rate = float(reaction.get('min_k1'))
+                reactionParam.max_rate = float(reaction.get('max_k1'))
 
 def initializeRevReactionParams(reactionParams, parsedConfigFile):
     for reactionParam in reactionParams:
@@ -107,11 +104,10 @@ def initializeRevReactionParams(reactionParams, parsedConfigFile):
                     reactionParam.rate1 = reaction.get('k1')
                     reactionParam.rate2 = reaction.get('k2')
                     reactionParam.fixed = True
-                reactionParam.min_rate1 = reaction.get('min_k1')
-                reactionParam.max_rate1 = reaction.get('max_k1')
-                reactionParam.min_rate2 = reaction.get('min_k2')
-                reactionParam.max_rate2 = reaction.get('max_k2')
-
+                reactionParam.min_rate1 = float(reaction.get('min_k1'))
+                reactionParam.max_rate1 = float(reaction.get('max_k1'))
+                reactionParam.min_rate2 = float(reaction.get('min_k2'))
+                reactionParam.max_rate2 = float(reaction.get('max_k2'))
 
 def initializeSpeciesParams(speciesParams, parsedConfigFile):
     for speciesParam in speciesParams:
@@ -120,8 +116,8 @@ def initializeSpeciesParams(speciesParams, parsedConfigFile):
                 if species.get('initialAmount') != '':
                     speciesParam.initial_amount = species.get('initialAmount')
                     speciesParam.fixed = True
-                speciesParam.min_amount = species.get('minAmount')
-                speciesParam.max_amount = species.get('maxAmount')
+                speciesParam.min_amount = float(species.get('minAmount'))
+                speciesParam.max_amount = float(species.get('maxAmount'))
 
 def parseFile(file):
     tree = ET.parse(file)
