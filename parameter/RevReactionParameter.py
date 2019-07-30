@@ -28,10 +28,21 @@ class RevReactionParameter(ReactionParameter):
                 self.min_rate2 = float(reaction.get('min_k2'))
                 self.max_rate2 = float(reaction.get('max_k2'))
 
-    def set_value_to_model(self, model):
-        super().set_value_to_model(model)
+    def pass_parameter_to_model(self, model):
+        super().pass_parameter_to_model(model)
         self.set_rate2_to_model(model)
 
     def set_rate2_to_model(self, model):
         param_name = self.compartment + ".const_k2[" + self.k2_index + "]"
         model.setParameters(**{param_name: self.rate2})
+
+    def set_value_to_model(self, model, value):
+        param_name = self.compartment + ".const_k2[" + self.k2_index + "]"
+        model.setParameters(**{param_name: value})
+
+    def set_search_value(self, value):
+        self.rate1 = value[0]
+        self.rate2 = value[1]
+
+    def get_search_value(self):
+        return self.rate1, self.rate2

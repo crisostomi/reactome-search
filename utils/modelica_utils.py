@@ -1,14 +1,8 @@
 import OMPython
-import os
 import pandas as pd                # dataframes
 import matplotlib.pyplot as plt    # plottare grafici
 import seaborn as sns              # si basa su plt, ha funzioni piu sofisticate
-import shutil
-import glob
-import xml.etree.ElementTree as ET
-from parameter.SpeciesParameter import SpeciesParameter
-from parameter.ReactionParameter import ReactionParameter
-from parameter.RevReactionParameter import RevReactionParameter
+import os
 
 def load_model(folder_path, file_name, class_name):
     file_path = folder_path + file_name
@@ -22,16 +16,7 @@ def load_model(folder_path, file_name, class_name):
     dependencies.append(user_home + '/Dropbox/Tesisti/software/BioChem-1.0.1/new-models/reactions.mo')
     return OMPython.ModelicaSystem(file_path, class_name, dependencies)
 
-def moveOutput():
-    os.mkdir("./output")
-    for file in glob.glob(r'./BioSystem*'):
-        shutil.move(file, './output')
-
-def flushOutput():
-    shutil.rmtree('./output/', ignore_errors=True)
-
 # Ritorna un oggetto Pandas DataFrame con all'interno i datapoints ({istante, valore}) delle variabili simulate del modello
-
 def get_solutions(model, variables=[]):
     # recupera la "linea temporale"
     time = model.getSolutions("time")
@@ -61,38 +46,3 @@ def plot_solutions(solution_frame, variables=[]):
     else:
         sns.lineplot(data=solution_frame[solution_frame['variable'].isin(variables)], x="time", y="value", hue="variable")
     plt.show()
-
-# Ritorna una lista di nomi di parametri, i quali non sono definiti e a cui va assegnato un valore prima di simulare
-
-
-def getParams(parsedConfigFile):
-    return getSpeciesParameters(parsedConfigFile) + getRevReactionParameters(parsedConfigFile) + getIrrevReactionParameters(parsedConfigFile)
-
-def getSpeciesParameters(parsedConfigFile):
-    return [ SpeciesParameter(species.get('id'), species.get('bounds_index'), species.get('init_index'), species.get('compartment')) for species in parsedConfigFile.iter('species')]
-
-def getRevReactionParameters(parsedConfigFile):
-    return [ RevReactionParameter(reaction.get('id'), reaction.get('k1_index'), reaction.get('k2_index'), reaction.get('compartment')) for reaction in parsedConfigFile.iter('reversible')]
-
-def getIrrevReactionParameters(parsedConfigFile):
-    return [ ReactionParameter(reaction.get('id'), reaction.get('k1_index'), reaction.get('compartment')) for reaction in parsedConfigFile.iter('irreversible')]
-
-
-
-def getUndefinedParams(params):
-    return [ param for param in params if param.fixed == False ]
-
-
-def initializeParams(params, configFileRoot):
-    for param in params:
-        param.initialize(configFileRoot)
-
-
-def parseFile(file):
-    tree = ET.parse(file)
-    return tree.getroot()
-
-def setFixedParams(model, params):
-    for param in params:
-        if param.is_fixed():
-            param.set_value_to_model(model)

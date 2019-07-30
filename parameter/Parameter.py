@@ -15,5 +15,20 @@ class Parameter:
     def get_id(self):
         return self.id
 
-    def set_value_to_model(self, model):
+    def pass_parameter_to_model(self, model):
         pass
+
+    def set_value_to_model(self, model, value):
+        pass
+
+    def set_search_value(self, value):
+        pass
+
+    def get_search_value(self):
+        pass
+
+    def get_random_value_in_bounds(self):
+        pass
+
+    def __eq__(self, obj):
+        return isinstance(obj, Parameter) and obj.id == self.id and obj.get_search_value() == self.get_search_value()

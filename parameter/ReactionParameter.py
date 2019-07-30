@@ -20,12 +20,22 @@ class ReactionParameter(Parameter):
                 if reaction.get('k1') != '':
                     self.rate = float(reaction.get('k1'))
                     self.fixed = True
-                self.min_rate = float(reaction.get('min_k1'))
-                self.max_rate = float(reaction.get('max_k1'))
+                self.min_rate1 = float(reaction.get('min_k1'))
+                self.max_rate1 = float(reaction.get('max_k1'))
 
-    def set_value_to_model(self, model):
+    def pass_parameter_to_model(self, model):
         self.set_rate1_to_model(model)
 
     def set_rate1_to_model(self, model):
-        param_name = self.compartment + ".const_k1[" + self.k1_index + "]"
+        param_name = self.compartment + ".const_k1[" + str(self.k1_index) + "]"
         model.setParameters(**{param_name: self.rate1})
+
+    def set_value_to_model(self, model, value):
+        param_name = self.compartment + ".const_k1[" + str(self.k1_index) + "]"
+        model.setParameters(**{param_name: value})
+
+    def set_search_value(self, value):
+        self.rate = value
+
+    def get_search_value(self):
+        return self.rate

@@ -24,6 +24,16 @@ class SpeciesParameter(Parameter):
                 self.min_amount = float(species.get('minAmount'))
                 self.max_amount = float(species.get('maxAmount'))
 
-    def set_value_to_model(self, model):
+    def pass_parameter_to_model(self, model):
         param_name = self.compartment + ".init[" + self.initIndex + "]"
         model.setParameters(**{param_name: self.initial_amount})
+
+    def set_value_to_model(self, model, value):
+        param_name = self.compartment + ".init[" + self.initIndex + "]"
+        model.setParameters(**{param_name: value})
+
+    def set_search_value(self, value):
+        self.initial_amount = value
+
+    def get_search_value(self):
+        return self.initial_amount
