@@ -2,10 +2,6 @@ from utils import *
 from state import *
 import sys
 import warnings
-import numpy as np
-from SpeciesParameter import SpeciesParameter
-from ReactionParameter import ReactionParameter
-import xml.etree.ElementTree as ET
 
 
 warnings.filterwarnings('ignore')  # ignora tutti i warning
@@ -17,56 +13,26 @@ if __name__ == '__main__':
     folder_path = sys.argv[1]
     file_name = "BioSystem.mo"
     class_name = "BioSystem.Cell"
-
-
+    config_file = sys.argv[2]
+    kb_file = sys.argv[3]
     model = load_model(folder_path, file_name, class_name)
-    params = [param["Name"] for param in model.getQuantities()]
-
-    speciesParams = [ SpeciesParameter(speciesParam) for speciesParam in getSpeciesParameters(params)]
-    reactionParams = [ ReactionParameter(reactionParam) for reactionParam in getReactionParameters(params)]
-
-    tree = ET.parse(sys.argv[2])
-    root = tree.getroot()
 
 
-    undefSpeciesParams = []
-    undefReactionParams = []
+    parsedConfigFile = parseFile(config_file)
 
-    for speciesParam in speciesParams:
-        for species in root.iter('species'):
-            if speciesParam.species_id == species.get('id'):
-                if species.get('initialAmount') != '':
-                    speciesParam.initial_amount = species.get('initialAmount')
-                    reactionParam.fixed = True
-                else:
-                    undefSpeciesParams.append(speciesParam)
-                speciesParam.min_amount = species.get('minAmount')
-                speciesParam.max_amount = species.get('maxAmount')
+    speciesParams = getSpeciesParameters(parsedConfigFile)
+    irrevReactionParams = getIrrevReactionParameters(parsedConfigFile)
+    revReactionParams = getRevReactionParameters(parsedConfigFile)
 
-    for reactionParam in reactionParams:
-        for reaction in root.iter('irreversible'):
-            if reactionParam.reaction_id == reaction.get('id'):
-                if reaction.get('k1') != '':
-                    reactionParam.rate = reaction.get('k1')
-                    reactionParam.fixed = True
-                else:
-                    undefReactionParams.append(reactionParam)
-                reactionParam.min_rate = reaction.get('min_k1')
-                reactionParam.max_rate = reaction.get('max_k1')
+    parsedKbFile = parseFile(kb_file)
 
-    for reactionParam in reactionParams:
-        for reaction in root.iter('reversible'):
-            if reactionParam.reaction_id == reaction.get('id'):
-                if (reaction.get('k1') != '') and (reaction.get('k2') != ''):
-                    reactionParam.rate1 = reaction.get('k1')
-                    reactionParam.rate2 = reaction.get('k2')
-                    reactionParam.fixed = True
-                else:
-                    undefReactionParams.append(reactionParam)
-                reactionParam.min_rate1 = reaction.get('min_k1')
-                reactionParam.max_rate1 = reaction.get('max_k1')
-                reactionParam.min_rate2 = reaction.get('min_k2')
-                reactionParam.max_rate2 = reaction.get('max_k2')
+    initializeSpeciesParams(speciesParams, parsedKbFile)
+    initializeIrrevReactionParams(irrevReactionParams, parsedKbFile)
+    initializeRevReactionParams(revReactionParams, parsedKbFile)
+
+    undefSpeciesParams = getUndefinedSpeciesParams(speciesParams)
+    undefIrrevReactionParams = getUndefinedIrrevReactionParams(irrevReactionParams)
+    undefRevReactionParams = getUndefinedRevReactionParams(revReactionParams)
 
     # initial_state = State(folder_path, file_name, class_name)
     # undef = getUndefinedParameters(initial_state.model)

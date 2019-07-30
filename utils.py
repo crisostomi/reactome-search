@@ -6,6 +6,9 @@ import seaborn as sns              # si basa su plt, ha funzioni piu sofisticate
 import shutil
 import glob
 import re
+import xml.etree.ElementTree as ET
+from SpeciesParameter import SpeciesParameter
+from ReactionParameter import ReactionParameter
 
 
 def load_model(folder_path, file_name, class_name):
@@ -67,22 +70,59 @@ def plot_solutions(solution_frame, variables=[]):
 def getUndefinedParameters(model):
     return [parameter for parameter,value in model.getParameters().items() if value is None]
 
-def getSpeciesParameters(params):
-    species_params = set()
-    for param in params:
-        m = re.match(".+species\_([0-9]+)", param)
-        if m is not None:
-            speciesName = "species_"+m.group(1)
-            species_params.add(speciesName)
-    return species_params
+def getSpeciesParameters(parsedConfigFile):
+    return [ SpeciesParameter(species.get('id'), species.get('bounds_index'), species.get('init_index')) for species in parsedConfigFile.iter('species')]
 
-def getReactionParameters(params):
-    reaction_params = set()
-    for param in params:
-        m = re.match(".+reaction\_([0-9]+)", param)
-        if m is not None:
-            reactionName = "reaction_"+m.group(1)
-            reaction_params.add(reactionName)
+def getRevReactionParameters(parsedConfigFile):
+    return [ ReactionParameter(reaction.get('id'), True, reaction.get('k1_index'), reaction.get('k2_index')) for reaction in parsedConfigFile.iter('reversible')]
 
-    return reaction_params
+def getIrrevReactionParameters(parsedConfigFile):
+    return [ ReactionParameter(reaction.get('id'), False, reaction.get('k1_index'), reaction.get('k2_index')) for reaction in parsedConfigFile.iter('irreversible')]
 
+def getUndefinedSpeciesParams(speciesParams):
+    return [ speciesParam for speciesParam in speciesParams if not speciesParam.fixed ]
+
+def getUndefinedRevReactionParams(reactionParams):
+    return [ speciesParam for speciesParam in reactionParams if (not speciesParam.fixed and speciesParam.reversible) ]
+
+def getUndefinedIrrevReactionParams(reactionParams):
+    return [ speciesParam for speciesParam in reactionParams if (not speciesParam.fixed and not speciesParam.reversible)]
+
+def initializeIrrevReactionParams(reactionParams, configFileRoot):
+    for reactionParam in reactionParams:
+        for reaction in configFileRoot.iter('irreversible'):
+            if reactionParam.reaction_id == reaction.get('id'):
+                if reaction.get('k1') != '':
+                    reactionParam.rate = reaction.get('k1')
+                    reactionParam.fixed = True
+                reactionParam.min_rate = reaction.get('min_k1')
+                reactionParam.max_rate = reaction.get('max_k1')
+
+def initializeRevReactionParams(reactionParams, parsedConfigFile):
+    for reactionParam in reactionParams:
+        for reaction in parsedConfigFile.iter('reversible'):
+            if reactionParam.reaction_id == reaction.get('id'):
+                reactionParam.reversible = True
+                if (reaction.get('k1') != '') and (reaction.get('k2') != ''):
+                    reactionParam.rate1 = reaction.get('k1')
+                    reactionParam.rate2 = reaction.get('k2')
+                    reactionParam.fixed = True
+                reactionParam.min_rate1 = reaction.get('min_k1')
+                reactionParam.max_rate1 = reaction.get('max_k1')
+                reactionParam.min_rate2 = reaction.get('min_k2')
+                reactionParam.max_rate2 = reaction.get('max_k2')
+
+
+def initializeSpeciesParams(speciesParams, parsedConfigFile):
+    for speciesParam in speciesParams:
+        for species in parsedConfigFile.iter('species'):
+            if speciesParam.species_id == species.get('id'):
+                if species.get('initialAmount') != '':
+                    speciesParam.initial_amount = species.get('initialAmount')
+                    speciesParam.fixed = True
+                speciesParam.min_amount = species.get('minAmount')
+                speciesParam.max_amount = species.get('maxAmount')
+
+def parseFile(file):
+    tree = ET.parse(file)
+    return tree.getroot()
