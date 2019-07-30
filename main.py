@@ -17,26 +17,18 @@ if __name__ == '__main__':
     kb_file = sys.argv[3]
     model = load_model(folder_path, file_name, class_name)
 
-    # parsedConfigFile = parseFile(config_file)
+    parsedConfigFile = parseFile(config_file)
 
-    # speciesParams = getSpeciesParameters(parsedConfigFile)
-    # irrevReactionParams = getIrrevReactionParameters(parsedConfigFile)
-    # revReactionParams = getRevReactionParameters(parsedConfigFile)
-    #
-    # parsedKbFile = parseFile(kb_file)
-    #
-    # initializeSpeciesParams(speciesParams, parsedKbFile)
-    # initializeIrrevReactionParams(irrevReactionParams, parsedKbFile)
-    # initializeRevReactionParams(revReactionParams, parsedKbFile)
-    #
-    # undefSpeciesParams = getUndefinedSpeciesParams(speciesParams)
-    # undefIrrevReactionParams = getUndefinedIrrevReactionParams(irrevReactionParams)
-    # undefRevReactionParams = getUndefinedRevReactionParams(revReactionParams)
-    #
-    # initial_state = State(model)
-    #
-    # setFixedSpeciesParameters(model, speciesParams)
-    # setFixedIrrevReactionParameters(model, revReactionParams)
-    # setFixedRevReactionParameters(model, irrevReactionParams)
+    params = getParams(parsedConfigFile)
+
+    parsedKbFile = parseFile(kb_file)
+
+    initializeParams(params, parsedKbFile)
+
+    undefinedParams = getUndefinedParams(params)
+
+    setFixedParams(model, params)
+
+    modelParams = model.getParameters()
 
     moveOutput()

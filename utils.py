@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt    # plottare grafici
 import seaborn as sns              # si basa su plt, ha funzioni piu sofisticate
 import shutil
 import glob
-import re
 import xml.etree.ElementTree as ET
-from SpeciesParameter import SpeciesParameter
-from ReactionParameter import ReactionParameter
+from parameter.SpeciesParameter import SpeciesParameter
+from parameter.ReactionParameter import ReactionParameter
+from parameter.RevReactionParameter import RevReactionParameter
 
 def load_model(folder_path, file_name, class_name):
     file_path = folder_path + file_name
@@ -64,88 +64,35 @@ def plot_solutions(solution_frame, variables=[]):
 
 # Ritorna una lista di nomi di parametri, i quali non sono definiti e a cui va assegnato un valore prima di simulare
 
-def getUndefinedParameters(model):
-    return [parameter for parameter,value in model.getParameters().items() if value is None]
+
+def getParams(parsedConfigFile):
+    return getSpeciesParameters(parsedConfigFile) + getRevReactionParameters(parsedConfigFile) + getIrrevReactionParameters(parsedConfigFile)
 
 def getSpeciesParameters(parsedConfigFile):
     return [ SpeciesParameter(species.get('id'), species.get('bounds_index'), species.get('init_index'), species.get('compartment')) for species in parsedConfigFile.iter('species')]
 
 def getRevReactionParameters(parsedConfigFile):
-    return [ ReactionParameter(reaction.get('id'), True, reaction.get('k1_index'), reaction.get('k2_index'), reaction.get('compartment')) for reaction in parsedConfigFile.iter('reversible')]
+    return [ RevReactionParameter(reaction.get('id'), reaction.get('k1_index'), reaction.get('k2_index'), reaction.get('compartment')) for reaction in parsedConfigFile.iter('reversible')]
 
 def getIrrevReactionParameters(parsedConfigFile):
-    return [ ReactionParameter(reaction.get('id'), False, reaction.get('k1_index'), reaction.get('compartment')) for reaction in parsedConfigFile.iter('irreversible')]
+    return [ ReactionParameter(reaction.get('id'), reaction.get('k1_index'), reaction.get('compartment')) for reaction in parsedConfigFile.iter('irreversible')]
 
-def getUndefinedSpeciesParams(speciesParams):
-    return [ speciesParam for speciesParam in speciesParams if not speciesParam.fixed ]
 
-def getUndefinedRevReactionParams(reactionParams):
-    return [ speciesParam for speciesParam in reactionParams if (not speciesParam.fixed and speciesParam.reversible) ]
 
-def getUndefinedIrrevReactionParams(reactionParams):
-    return [ speciesParam for speciesParam in reactionParams if (not speciesParam.fixed and not speciesParam.reversible)]
+def getUndefinedParams(params):
+    return [ param for param in params if param.fixed == False ]
 
-def initializeIrrevReactionParams(reactionParams, configFileRoot):
-    for reactionParam in reactionParams:
-        for reaction in configFileRoot.iter('irreversible'):
-            if reactionParam.reaction_id == reaction.get('id'):
-                if reaction.get('k1') != '':
-                    reactionParam.rate = float(reaction.get('k1'))
-                    reactionParam.fixed = True
-                reactionParam.min_rate = float(reaction.get('min_k1'))
-                reactionParam.max_rate = float(reaction.get('max_k1'))
 
-def initializeRevReactionParams(reactionParams, parsedConfigFile):
-    for reactionParam in reactionParams:
-        for reaction in parsedConfigFile.iter('reversible'):
-            if reactionParam.reaction_id == reaction.get('id'):
-                reactionParam.reversible = True
-                if (reaction.get('k1') != '') and (reaction.get('k2') != ''):
-                    reactionParam.rate1 = reaction.get('k1')
-                    reactionParam.rate2 = reaction.get('k2')
-                    reactionParam.fixed = True
-                reactionParam.min_rate1 = float(reaction.get('min_k1'))
-                reactionParam.max_rate1 = float(reaction.get('max_k1'))
-                reactionParam.min_rate2 = float(reaction.get('min_k2'))
-                reactionParam.max_rate2 = float(reaction.get('max_k2'))
+def initializeParams(params, configFileRoot):
+    for param in params:
+        param.initialize(configFileRoot)
 
-def initializeSpeciesParams(speciesParams, parsedConfigFile):
-    for speciesParam in speciesParams:
-        for species in parsedConfigFile.iter('species'):
-            if speciesParam.species_id == species.get('id'):
-                if species.get('initialAmount') != '':
-                    speciesParam.initial_amount = species.get('initialAmount')
-                    speciesParam.fixed = True
-                speciesParam.min_amount = float(species.get('minAmount'))
-                speciesParam.max_amount = float(species.get('maxAmount'))
 
 def parseFile(file):
     tree = ET.parse(file)
     return tree.getroot()
 
-def setSpeciesParameter(model, speciesParameter, value):
-    param_name = speciesParameter.compartment+".init[" + speciesParameter.initIndex + "]"
-    model.setParameters(**{param_name: value})
-
-def setRevReactionParameter(model, reactionParameter, value):
-    param_name = reactionParameter.compartment+".init[" + reactionParameter.initIndex + "]"
-    model.setParameters(**{param_name: value})
-
-def setIrrevReactionParameter(model, reactionParameter, value):
-    param_name = reactionParameter.compartment+".init[" + reactionParameter.initIndex + "]"
-    model.setParameters(**{param_name: value})
-
-def setFixedSpeciesParameters(model, speciesParams):
-    for speciesParam in speciesParams:
-        if speciesParam.fixed:
-            setSpeciesParameter(model, speciesParam, speciesParam.initial_amount)
-
-def setFixedIrrevReactionParameters(model, reactionParams):
-    for reactionParam in reactionParams:
-        if reactionParam.fixed:
-            setRevReactionParameter(model, reactionParam, reactionParam.initial_amount)
-
-def setFixedRevReactionParameters(model, reactionParams):
-    for reactionParam in reactionParams:
-        if reactionParam.fixed:
-            setIrrevReactionParameter(model, reactionParam, reactionParam.initial_amount)
+def setFixedParams(model, params):
+    for param in params:
+        if param.is_fixed():
+            param.set_value_to_model(model)

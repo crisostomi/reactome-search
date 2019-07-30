@@ -15,4 +15,5 @@ class Parameter:
     def get_id(self):
         return self.id
 
-
+    def set_value_to_model(self, model):
+        pass
