@@ -36,10 +36,6 @@ class RevReactionParameter(ReactionParameter):
         param_name = self.compartment + ".const_k2[" + self.k2_index + "]"
         model.setParameters(**{param_name: self.rate2})
 
-    def set_value_to_model(self, model, value):
-        param_name = self.compartment + ".const_k2[" + self.k2_index + "]"
-        model.setParameters(**{param_name: value})
-
     def set_search_value(self, value):
         self.rate1 = value[0]
         self.rate2 = value[1]

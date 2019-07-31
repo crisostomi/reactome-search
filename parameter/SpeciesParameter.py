@@ -8,7 +8,6 @@ class SpeciesParameter(Parameter):
         self.initial_amount = None
         self.min_amount = None
         self.max_amount = None
-        self.amount = None
         self.monitorIndex = monitorIndex
         self.initIndex = initIndex
 
@@ -25,12 +24,17 @@ class SpeciesParameter(Parameter):
                 self.max_amount = float(species.get('maxAmount'))
 
     def pass_parameter_to_model(self, model):
+        self.pass_initial_amount_to_model(model)
+        self.pass_monitor_to_model(model)
+
+    def pass_initial_amount_to_model(self, model):
         param_name = self.compartment + ".init[" + self.initIndex + "]"
         model.setParameters(**{param_name: self.initial_amount})
 
-    def set_value_to_model(self, model, value):
-        param_name = self.compartment + ".init[" + self.initIndex + "]"
-        model.setParameters(**{param_name: value})
+    def pass_monitor_to_model(self, model):
+        param_name_min = "mon." + "minAmount[" + self.monitorIndex + "]"
+        param_name_max = "mon." + "maxAmount[" + self.monitorIndex + "]"
+        model.setParameters(**{param_name_min: self.min_amount, param_name_max: self.max_amount})
 
     def set_search_value(self, value):
         self.initial_amount = value

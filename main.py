@@ -34,8 +34,8 @@ if __name__ == '__main__':
     problem = Problem(model, undefinedParams)
 
 
-    step = float(sys.argv[3])
-    treshold = float(sys.argv[4])
+    step = 1 # float(sys.argv[3])
+    treshold = 0.05 # float(sys.argv[4])
     result = simulated_annealing.search(problem, step, treshold)
 
     moveOutput()

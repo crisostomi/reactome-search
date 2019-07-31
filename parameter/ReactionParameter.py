@@ -18,7 +18,7 @@ class ReactionParameter(Parameter):
         for reaction in configFileRoot.iter('irreversible'):
             if self.id == reaction.get('id'):
                 if reaction.get('k1') != '':
-                    self.rate = float(reaction.get('k1'))
+                    self.rate1 = float(reaction.get('k1'))
                     self.fixed = True
                 self.min_rate1 = float(reaction.get('min_k1'))
                 self.max_rate1 = float(reaction.get('max_k1'))
@@ -30,12 +30,8 @@ class ReactionParameter(Parameter):
         param_name = self.compartment + ".const_k1[" + str(self.k1_index) + "]"
         model.setParameters(**{param_name: self.rate1})
 
-    def set_value_to_model(self, model, value):
-        param_name = self.compartment + ".const_k1[" + str(self.k1_index) + "]"
-        model.setParameters(**{param_name: value})
-
     def set_search_value(self, value):
-        self.rate = value
+        self.rate1 = value
 
     def get_search_value(self):
-        return self.rate
+        return self.rate1
