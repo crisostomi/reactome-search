@@ -35,9 +35,6 @@ class Problem:
         monitor_name = "mon." + species_param.id + "_monitor"
         monitor = get_solutions(self.model, [monitor_name])
 
-        print(monitor)
-
         monitor_value = monitor['value'].iloc[-1]
-
 
         return monitor_value

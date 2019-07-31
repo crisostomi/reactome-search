@@ -16,12 +16,12 @@ def search(problem, step, treshold):
         adjacents = current_node.get_adjacents(step)
         next = random.choice(adjacents)
         value_difference = problem.find_value(next.state) - problem.find_value(current_node.state)
-    #     if value_difference > 0:
-    #         current_node = next
-    #     else:
-    #         prob = math.exp(value_difference / T)
-    #         if random.random() <= prob:
-    #             current_node = next
+        if value_difference > 0:
+            current_node = next
+        else:
+            prob = math.exp(value_difference / T)
+            if random.random() <= prob:
+                current_node = next
         time += 1
 
 

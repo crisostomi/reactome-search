@@ -32,10 +32,10 @@ if __name__ == '__main__':
     setFixedParams(model, params)
 
     problem = Problem(model, undefinedParams)
+    problem.model.setSimulationOptions(stopTime="60")
 
-
-    step = 1 # float(sys.argv[3])
-    treshold = 0.05 # float(sys.argv[4])
+    step = 1E-2 # float(sys.argv[3])
+    treshold = 5E-2 # float(sys.argv[4])
     result = simulated_annealing.search(problem, step, treshold)
 
     moveOutput()
